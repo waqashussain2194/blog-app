@@ -1,0 +1,4 @@
+$('.delcom').bind('ajax:success', function(){
+  $('.commentCon<%= @comment.id %>').hide();
+  $('#likesCount').text(<%= @post.reactions.count %>+" Likes "+<%= @post.comments.count %>+" Comments");
+});

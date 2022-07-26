@@ -1,0 +1,68 @@
+<% @post = get_post(post) %>
+
+<% @post.comments.includes(:user).map do |comment| %>
+  <div class="commentCon<%= comment.id %>">
+    <p><%= comment.user.first_name %> Commented</p>
+    <p><%= comment.content.html_safe %></p>
+    <%= time_ago_in_words(comment.created_at) %> ago <br>
+    <% if comment.comments.exists? %>
+      <% comment.comments.map do |reply| %>
+        <p><%= "#{User.find(reply.user_id).first_name} replied: #{reply.content.html_safe}" %></p>
+      <% end %>
+    <% end %>
+
+    <div class="stats">
+      <% if user_signed_in? %>
+        <p id="commentsLikes"><%= comment.reactions.count %> Likes</p>
+        <% if comment.reactions.find_by(user_id: current_user.id) %>
+          <%= link_to 'unlike', post_comment_reactions_path(@post,comment), method: :delete, class: "btn btn-danger unlikecom" %>
+        <% else %>
+          <%= link_to 'like', post_comment_reactions_path(@post,comment), method: :post, class: "btn btn-success likecom" %>
+        <% end %>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter<%= comment.id %>">
+          Reply
+        </button>
+        <% if comment.user_id == current_user.id %>
+          <%= link_to 'Edit', edit_post_comment_path(@post,comment), class: "btn btn-primary" %>
+        <% end %>
+        <% if user_signed_in? %>
+          <% if comment_owner?(comment) || post_owner?(post) || role?(:admin) %>
+            <%= link_to 'Delete Comment', post_comment_path(@post,comment), method: :delete, data: {confirm: 'Are You Sure You Want To Delete This Comment?'}, remote: true, class: "btn btn-danger delcom" %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <i class="fa fa-thumbs-up icon"></i><%= comment.reactions.count %>
+      <% end %>
+      <br><br>
+      <!--MODAL REPLY-->
+      <div class="modal fade" id="exampleModalCenter<%= comment.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Reply</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            <h2>Add a Reply</h2>
+              <%= form_for([@post, comment, Comment.new]) do |f| %>
+                <%= f.text_area :content, class: 'form-control' %>
+                <%= f.hidden_field :user_id, :value => current_user.id %><br>
+                <%= f.submit class: 'btn btn-primary', value: 'Add'%>
+              <% end %>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--MODAL ENDS-->
+    </div>
+  </div>
+<% end %>
+
+

@@ -1,0 +1,11 @@
+
+
+$('.likebtn').bind('ajax:success', function(){
+  $('#likesMsg').text('You liked');
+  $('#likesCount').text(<%= @post.reactions.count %>+" Likes "+<%= @post.comments.count %>+" Comments");
+  $('.likebtn').hide();
+  $('.unlikebtn').show();
+
+});
+
+

@@ -1,0 +1,9 @@
+
+$('.unlikebtn').bind('ajax:success', function(){
+  $('#likesMsg').text('You Unliked');
+   $('#likesCount').text(<%= @post.reactions.count %>+" Likes "+<%= @post.comments.count %>+" Comments");
+  $('.unlikebtn').hide();
+  $('.likebtn').show();
+
+});
+

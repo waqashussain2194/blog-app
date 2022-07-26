@@ -1,0 +1,46 @@
+<div class="jumbotron">
+  <h1 class="display-4">You May Approve or Unpublish/Delete a Post</h1>
+</div>
+
+
+<% @posts.map do |post| %>
+  <% if !post.approved && !post.user.has_role?(:moderator) && !post.user.has_role?(:admin) %>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+      <h3 class="postTitleIndex"><strong>Post Title</strong>: <%= post.title %></h3>
+      <p><strong>Posted by</strong>: <%= post.user.first_name %></p>
+      <p><strong>Likes</strong>: <%= post.reactions.count %></p>
+      <% if post.comments.exists? %>
+        <p><strong>Latest Comment</strong>: <%= post.comments.last.content %></p>
+      <% else %>
+        <p><strong>No Comments Yet</strong></p>
+      <% end %>
+      <p><%= distance_of_time_in_words(post.created_at, Time.now) %> ago</p>
+
+      <p class="lead">
+        <%= link_to 'Delete post', post_path(post), method: :delete, data: {confirm: 'Are You Sure You Want To Delete This Post?'}, :class => "btn btn-danger" %>
+        <%= link_to 'Show', post_path(post), :class => "btn btn-primary" %>
+        <%= link_to 'Approve', moderator_accept_path(post), :class => "btn btn-success" %>
+      </p>
+    </div>
+  <% end%>
+<% end %>
+
+
+
+<% @all_posts.each do |post| %>
+  <% if post.reports.exists? %>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+      <h3 class="postTitleIndex"><strong>Post Title</strong>: <%= post.title %></h3>
+      <p><strong>Posted by</strong>: <%= post.user.first_name %></p>
+      <p><strong>This Post Has Been Reported <%= post.reports.count %> time(s)</strong></p>
+      <p><strong>Kindly Take Necessary Actions for this Post</strong></p>
+      <p><%= distance_of_time_in_words(post.created_at, Time.now) %> ago</p>
+
+      <p class="lead">
+        <%= link_to 'Delete post', post_path(post), method: :delete, data: {confirm: 'Are You Sure You Want To Delete This Post?'}, :class => "btn btn-danger" %>
+        <%= link_to 'Show', post_path(post),  class: "btn btn-primary" %>
+      </p>
+    </div>
+  <% end %>
+<% end %>
+

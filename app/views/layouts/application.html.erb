@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LogIntoBlog</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" %>
+    <%= stylesheet_link_tag "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" %>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag Ckeditor.cdn_url %>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand" href=<%= root_path %>>Log Into Blog</a>
+      <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse " id="navbarMenu">
+        <ul class="navbar-nav ">
+          <li class="nav-item"><a class="nav-link" href=<%= root_path %>>Home</a></li>
+          <% if user_signed_in? %>
+            <li class="nav-item"><a class="nav-link" href=<%= edit_user_registration_path %>>Hello, <%= current_user.first_name %></a></li>
+            <li class="nav-item"><a class="nav-link" href=<%= destroy_user_session_path %>>Logout</a></li>
+          <% else %>
+            <li class="nav-item"><a class="nav-link" href=<%= new_user_session_path %>>Login</a></li>
+            <li class="nav-item"><a class="nav-link" href=<%= new_user_registration_path %>>Sign Up</a></li>
+          <% end %>
+          <% if role?(:admin) && role?(:moderator) %>
+            <li class="nav-item"><a class="nav-link" href=<%= rails_admin_path %>>Admin Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href=<%= moderator_profile_path %>>Pending Posts</a></li>
+          <% elsif role?(:admin) %>
+            <li class="nav-item"><a class="nav-link" href=<%= rails_admin_path %>>Admin Dashboard</a></li>
+          <% elsif role?(:moderator) %>
+            <li class="nav-item"><a class="nav-link" href=<%= moderator_profile_path %>>Pending Posts</a></li>
+          <% end %>
+        </ul>
+      </div>
+    </nav>
+
+
+    <% if notice %>
+      <div class="alert alert-success">
+        <%= notice %>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="alert alert-danger">
+        <%= alert %>
+      </div>
+    <% end %>
+
+
+    <div class="container">
+      <%= yield %>
+    </div>
+    <%= javascript_include_tag "https://code.jquery.com/jquery-3.2.1.slim.min.js" %>
+    <%= javascript_include_tag "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" %>
+  </body>
+</html>

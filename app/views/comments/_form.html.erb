@@ -1,0 +1,4 @@
+<%= form_for([@post, @post.comments.build], :remote => true) do |f| %>
+  <%= f.cktext_area :content, class: 'form-control' %>
+  <%= f.submit class: 'btn btn-primary addcombtn' %>
+<% end %>

@@ -1,0 +1,50 @@
+<% @post = get_post(post) %>
+
+<% @post.suggestions.each do |suggestion| %>
+  <% @user = get_suggestion_owner(suggestion) %>
+  <div>
+    <% if suggestion_given_by?(suggestion) || post_owner?(@post) %>
+      <p><%= suggestion.content %></p>
+      <p><%= 'by '+ @user.first_name %></p>
+      <%= time_ago_in_words(suggestion.created_at) +' ago' if suggestion.created_at %><br>
+      <% if post_owner?(@post) || role?(:admin) %>
+        <%= link_to 'Accept', suggestion_accept_path(suggestion), :class => "btn btn-success" %>
+        <%= link_to 'Reject Suggestion', post_suggestion_path(@post,suggestion), method: :delete, data: {confirm: 'Are You Sure You Want To Delete This Suggestion?'}, :class => "btn btn-danger" %>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter<%= suggestion.id %>">
+          Reply
+        </button><br>
+      <% end %><br><br>
+      <% suggestion.comments.each do |sugg_reply| %>
+        <%= "#{get_suggestion_reply_user_name(sugg_reply)} replied: #{sugg_reply.content}" %><br>
+      <% end %>
+
+
+    <div class="modal fade" id="exampleModalCenter<%= suggestion.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Suggestions</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <% if post_owner?(@post) || role?(:admin)%>
+            <div class="modal-body">
+              <h2>Add a Reply</h2>
+              <%= form_for([@post, suggestion, Comment.new]) do |f| %>
+                <%= f.text_field :content, class: 'form-control' %>
+                <%= f.hidden_field :user_id, :value => current_user.id %><br>
+                <%= f.submit class: 'btn btn-primary', value: 'Add'%>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  </div>
+<% end %>
+

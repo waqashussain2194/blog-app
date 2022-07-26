@@ -1,0 +1,48 @@
+
+<div class="jumbotron">
+  <h1 class="display-4">Hello to Blog Post Application!</h1>
+  <p class="lead">We Provide The Fascility to Add, Remove, View and Delete Posts on This Application.</p>
+  <hr class="my-4">
+  <p>People Can View Posts on This Application and Interact with each other by commenting. Sign Up for Adding Yours Today!</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="<%= new_post_path %>" role="button">Add New post</a>
+  </p>
+</div>
+
+
+<div class="container">
+  <div class="row" id="postRow">
+    <% @posts.map do |post| %>
+
+      <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+        <div class="postContent<%= post.id %>">
+          <a href="<%= post_path(post) %>" id="postContainer">
+            <div class="jumbotron">
+              <h3 class="postTitleIndex"><strong>Post Title</strong>: <%= post.title %></h3>
+              <p><strong>Posted by</strong>: <%= post.user.first_name %></p>
+              <p><strong>Likes</strong>: <%= post.reactions.count %></p>
+              <% if post.comments.exists? %>
+                <p id="postContentIndex"><strong>Latest Comment</strong>: <%= truncate(post.comments.last.content.html_safe, length: 2) %></p>
+              <% else %>
+                <p><strong>No Comments Yet</strong></p>
+              <% end %>
+              <p><%= distance_of_time_in_words(post.created_at, Time.now) %> ago</p>
+            </div>
+          </a>
+          <p class="lead">
+            <% if user_signed_in? %>
+              <% if post_owner?(post) || role?(:admin) || role?(:moderator) %>
+                <%= link_to 'Delete post', post_path(post), method: :delete, data: {confirm: 'Are You Sure You Want To Delete This Post?'},remote: true, :class => "btn btn-danger deletebtn" %>
+              <% end %>
+              <% if post_owner?(post) || role?(:admin) %>
+                <%= link_to 'Edit post', edit_post_path(post), :class => "btn btn-primary" %>
+              <% end %>
+            <% end %>
+            <%= link_to 'Show', post_path(post), :class => "btn btn-primary" %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<%= paginate @posts %>
